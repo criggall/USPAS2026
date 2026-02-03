@@ -1,0 +1,68 @@
+
+Text output going to ASSIGNed echo file
+Theta =  0.184800 radians
+
+enter Twiss module
+
+++++++ table: summ
+
+     length      orbit5        alfa     gammatr 
+ 408.000000   -0.000000    0.108269    3.039125 
+
+         q1         dq1     betxmax       dxmax 
+   3.163851    2.255207   39.025266    9.120617 
+
+      dxrms      xcomax      xcorms          q2 
+   7.443829    0.000000    0.000000    3.158103 
+
+        dq2     betymax       dymax       dyrms 
+   2.746386   39.499121    0.000000    0.000000 
+
+     ycomax      ycorms      deltap     synch_1 
+   0.000000    0.000000    0.000000    0.000000 
+
+    synch_2     synch_3     synch_4     synch_5 
+   0.000000    0.000000    0.000000    0.000000 
+
+    synch_6     synch_8      nflips       dqmin 
+   0.000000    0.000000    0.000000    0.000000 
+
+dqmin_phase 
+   0.000000 
+START MATCHING
+
+number of sequences: 1
+sequence name: ring
+number of variables:    2
+user given constraints: 1
+total constraints:      2
+
+START LMDIF:
+
+
+MATCH SUMMARY
+
+Node_Name                  Constraint   Type  Target Value       Final Value        Penalty
+--------------------------------------------------------------------------------------------------
+
+
+Final Penalty Function =   1.77882140e-23
+
+
+
+
+
+Variable                 Final Value  Initial Value Lower Limit  Upper Limit 
+--------------------------------------------------------------------------------
+ksf                       9.57791e-03  1.80200e-02 -1.00000e+20  1.00000e+20
+ksd                      -1.58883e-02 -3.06280e-02 -1.00000e+20  1.00000e+20
+
+END MATCH SUMMARY
+
+VARIABLE "TAR" SET TO   1.77882140e-23
+
+H & V tunes          (Q1,Q2)    = 3.163851 3.158103
+H & V chromaticities (DQ1, DQ2) = -0.000000 0.000000
+! Find DQ1 & DQ2 from ++++++ table: summ printout in madx.log !
+
+

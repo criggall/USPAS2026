@@ -1,0 +1,91 @@
+!==================================================================
+! Simple FODO ring with periodic optics, surveying & chromaticities
+! Authors: Todd Satogata, Steve Peggs 
+! Last edited: September 2.2025
+!==================================================================
+
+beam, particle = proton, energy = 275.0;
+assign, echo = madx.log;
+
+title,'Simple FODO ring';
+
+! Geometry
+Ncells  = 17;                ! Number of FODO cells in the ring
+Theta   = pi / Ncells;       ! Arc dipole bend angle 
+Ldrift  = 0.5;                ! Drift length
+Ldipole = 10.0;              ! Arc dipole length
+Lquad   = 1.0;               ! Total quad length
+Lsext   = 0.5;               ! Sextupole length
+
+! Strengths
+KF    =  0.09020;            ! m^(-2)
+KD    = -0.09320;            ! m^(-2)
+KSF   =  0.0;                ! m^(-3)
+KSD   = -0.0;                ! m^(-3)
+!KSF   =  0.018020;          ! m^(-3)
+!KSD   = -0.030628;          ! m^(-3)
+
+! Magnets
+MQ:  marker;                                  ! At the center of every quad
+DRI: DRIFT,         L = Ldrift;
+DIP: SBEND,         L = Ldipole, ANGLE = Theta;  ! Main arc dipole
+QFhalf: QUADRUPOLE, L = 0.5*Lquad, K1= KF;       ! HALF quads
+QDhalf: QUADRUPOLE, L = 0.5*Lquad, K1= KD;
+SF:  SEXTUPOLE,     L = Lsext, K2 = KSF;
+SD:  SEXTUPOLE,     L = Lsext, K2 = KSD;
+
+! Beamlines
+fodo_fd:   line = (QFhalf, SF, DIP, DRI, QDhalf);
+fodo_df:   line = (QDhalf, SD, DIP, DRI, QFhalf);
+fodo_cell: line = (MQ, fodo_fd, MQ, fodo_df);
+! ring:      line = (Ncells*fodo_cell);   ! This FAILS !
+ring:      line = (17*fodo_cell, MQ);
+
+!=========================================================================
+! Text and value output go to madx.log, the previously named echo filenane
+
+print, text ='' ;
+print,  text = 'Text output going to ASSIGNed echo file';
+printf, text = 'Theta =  %8.6f radians', value = Theta;
+print, text ='';
+
+
+!=========================================================================
+! Twiss output, text and plot
+
+! Define the columns & formats
+select, FLAG = TWISS, CLASS = MQ, COLUMN = name,s,betx,bety,alfx,alfy,dx,mux,muy;
+set, format="-15s", "11.6f";
+
+use, sequence = ring;
+twiss, save, file = ring.twi;
+plot, interpolate, haxis=s, vaxis1 =betx,bety, vaxis2=dx, vmin=0,0, vmax=60,2, colour=100, file = ring;
+
+!=========================================================================
+! Survey output
+
+! Define the columns & formats
+select, FLAG = SURVEY, CLASS = MQ, column = name, s, x,y,z, theta;
+! select, FLAG = SURVEY, CLASS = MQ;   ! Verbose output
+set, format="-15s", "11.6f";
+
+use, SEQUENCE = ring;
+Survey, FILE = ring.surv;
+
+
+!=========================================================================
+! Tune & chromaticity output
+
+print,  text ='' ;
+printf, text = 'H & V tunes          (Q1,Q2)    = %8.6f %8.6f', value = TABLE(SUMM,Q1),  TABLE(SUMM,Q2);
+printf, text = 'H & V chromaticities (DQ1, DQ2) = %8.6f %8.6f', value = TABLE(SUMM,DQ1),  TABLE(SUMM,DQ2);
+print,  text = '! Find DQ1 & DQ2 from ++++++ table: summ printout in madx.log !';
+print,  text ='' ;
+
+!----------------------------------------------------------
+stop;
+
+
+COMMENTS: ................................................
+0) Chromaticities DQ1 & DQ2 are inaccessible by "printf" into madx.log !
+

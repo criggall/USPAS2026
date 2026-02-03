@@ -1,0 +1,47 @@
+!====================================================
+! FODO cell with no dipoles
+! Authors: Todd Satogata, Steve Peggs
+! Last edit: March 2, 2024
+!====================================================
+
+! Define specie, TOTAL energy [GeV], and log file name
+BEAM, particle=proton, energy=275.0;
+ASSIGN, echo = madx.log;
+
+! Title for plots
+TITLE, 'Straight fodo cell';
+
+! Magnet definitions
+DRI: DRIFT,  L = 1.0;                    ! [m]
+QFH: QUADRUPOLE, L = 0.5, K1 =  0.19;    ! HALF length quadrupole F
+QDH: QUADRUPOLE, L = 0.5, K1 = -0.20;    ! HALF length quadrupole D
+
+! Define a 12 m long straight fodo cell, starting at a QF center
+fodo_cell_straight: LINE = (QFH, 5*DRI, QDH,QDH, 5*DRI, QFH);
+
+!==================================================================
+!! Propagate Twiss parameters from specific initial beta values
+
+USE, SEQUENCE = fodo_cell_straight;  ! Use this beamline with ..
+TWISS, BETX = 15.0, BETY = 5.0;      ! .. these initial values
+PLOT, HAXIS=S,VAXIS=BETX, BETY, COLOUR=100, file = fodo_straight;
+
+VALUE, TABLE(SUMM,Q1);               ! Write Q1 to madx.log 
+WRITE, TABLE=SUMM, FILE = fodo_straight.dat;  ! Very wide !
+
+!==================================================================
+!! Propagate Twiss functions with Periodic Boundary Conditions
+
+MATCH, SEQUENCE = fodo_cell_straight;
+TWISS, save;
+PLOT, HAXIS=S, VAXIS=BETX, BETY, COLOUR=100;
+
+stop;
+
+COMMENTS: .........................................................
+0) Including a "stop;" sign enables commentary like this.
+1) Usage: "madx fodo_straight.madx"
+2) White space doesn't matter.
+3) UPPER and lower case are irrelevant.
+4) Don't forget the end-of-line semi-colons ";" !
+5) ! or // can be used before comments

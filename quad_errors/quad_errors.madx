@@ -1,0 +1,80 @@
+//=====================================
+// Effect of a quad error
+// Authors: Todd Satogata & Steve Peggs
+// Last edited: September 5 2025
+//=====================================
+
+beam, particle=proton, energy=275.0;
+assign, echo = madx.log;
+
+title,'Quadrupole errors';
+
+// Geometry
+L_drift     = 2.116775;
+L_dipole    = 9.45;
+theta       = 0.038924;
+L_half_quad = 0.555;
+
+// Strengths
+kf = 0.08537;
+kd = kf;
+
+k_error_6 =  0.000;     // error initially OFF !!
+k_error_7 =  0.000;     // error initially OFF  !!
+
+// Drifts
+D: DRIFT,  L = L_drift;
+
+// Dipoles
+DIP: SBEND, L = L_dipole, ANGLE = theta;
+
+// Quadrupoles -- half length
+QFH1:  QUADRUPOLE, L= L_half_quad, K1=  kf;
+QDH1:  QUADRUPOLE, L= L_half_quad, K1= -kd;
+QFH2:  QUADRUPOLE, L= L_half_quad, K1=  kf;
+QDH2:  QUADRUPOLE, L= L_half_quad, K1= -kd;
+QFH3:  QUADRUPOLE, L= L_half_quad, K1=  kf;
+QDH3:  QUADRUPOLE, L= L_half_quad, K1= -kd;
+QFH4:  QUADRUPOLE, L= L_half_quad, K1=  kf;
+QDH4:  QUADRUPOLE, L= L_half_quad, K1= -kd;
+QFH5:  QUADRUPOLE, L= L_half_quad, K1=  kf;
+QDH5:  QUADRUPOLE, L= L_half_quad, K1= -kd;
+QFH6:  QUADRUPOLE, L= L_half_quad, K1=  (kf + k_error_6);
+QDH6:  QUADRUPOLE, L= L_half_quad, K1= -kd;
+QFH7:  QUADRUPOLE, L= L_half_quad, K1=  (kf + k_error_7);
+QDH7:  QUADRUPOLE, L= L_half_quad, K1= -kd;
+QFH8:  QUADRUPOLE, L= L_half_quad, K1=  kf;
+QDH8:  QUADRUPOLE, L= L_half_quad, K1= -kd;
+QFH9:  QUADRUPOLE, L= L_half_quad, K1=  kf;
+QDH9:  QUADRUPOLE, L= L_half_quad, K1= -kd;
+QFH10: QUADRUPOLE, L= L_half_quad, K1=  kf;
+QDH10: QUADRUPOLE, L= L_half_quad, K1= -kd;
+
+// Beamlines
+FODODIP: LINE=(D, DIP, D);          // Interior of a half cell
+
+FODO1: LINE=(QFH1,  FODODIP, 2*QDH1,  FODODIP, QFH2);
+FODO2: LINE=(QFH2,  FODODIP, 2*QDH2,  FODODIP, QFH3);
+FODO3: LINE=(QFH3,  FODODIP, 2*QDH3,  FODODIP, QFH4);
+FODO4: LINE=(QFH4,  FODODIP, 2*QDH4,  FODODIP, QFH5);
+FODO5: LINE=(QFH5,  FODODIP, 2*QDH5,  FODODIP, QFH6);
+FODO6: LINE=(QFH6,  FODODIP, 2*QDH6,  FODODIP, QFH7);
+FODO7: LINE=(QFH7,  FODODIP, 2*QDH7,  FODODIP, QFH8);
+FODO8: LINE=(QFH8,  FODODIP, 2*QDH8,  FODODIP, QFH9);
+FODO9: LINE=(QFH9,  FODODIP, 2*QDH9,  FODODIP, QFH10);
+FODO10:LINE=(QFH10, FODODIP, 2*QDH10, FODODIP, QFH1);
+
+FODO_MANY: LINE=(FODO1, FODO2, FODO3, FODO4, FODO5, FODO6, FODO7, FODO8, FODO9, FODO10);
+
+use, sequence=fodo_many;
+// select,                     flag=twiss,column=name,s,betx,bety,alfx,alfy,dx,mux,muy; // see all magnets
+   select, class = quadrupole, flag=twiss,column=name,s,betx,bety,alfx,alfy,dx,mux,muy; // see quads only
+set, format="-22s", "11.6f";
+
+twiss, save, file=quad_err.twi;
+plot, interpolate, haxis=s,vaxis1=betx,bety, vaxis2=dx,vmin=0,0,vmax=70, 2, colour=100, file=quad_err;
+
+stop;
+
+COMMENTS: ................................................
+0) 

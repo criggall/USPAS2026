@@ -1,0 +1,51 @@
+!==================================================
+! RHIC FODO cell
+! Authors: Todd Satogata, Steve Peggs 
+! Last edited: February 28 2024
+!==================================================
+
+BEAM, particle = proton, energy = 275.0;
+ASSIGN, echo = madx.log;
+
+TITLE,'RHIC fodo cell';
+
+! Geometry
+LQUAD = 1.11;                               ! Total quad length
+LDIP  = 9.45;                               ! Arc dipole length
+THETA = 0.038924;                           ! Arc dipole bend angle 
+
+! Strengths
+KF =  0.09020;                              ! m^(-2)
+KD = -0.09320;                              ! m^(-2)
+
+! Magnets
+QFH: QUADRUPOLE, L = 0.5*LQUAD, K1= KF;           ! HALF quads
+QDH: QUADRUPOLE, L = 0.5*LQUAD, K1= KD;
+DRI: DRIFT,      L = 2.116775;
+DIPRHIC: SBEND,  L = LDIP, ANGLE = THETA;         ! Main arc dipole
+SLICE: SBEND,    L = 0.1*LDIP, ANGLE = 0.1*THETA; ! Slice of a dipole
+
+! Beamlines
+fodo_rhic:   LINE=(QFH, DRI, DIPRHIC,  DRI, 2*QDH, DRI, DIPRHIC,  DRI, QFH);
+fodo_sliced: LINE=(QFH, DRI, 10*SLICE, DRI, 2*QDH, DRI, 10*SLICE, DRI, QFH);
+
+! Define the columns & formats used in the *.twi output files
+SELECT, FLAG=TWISS, COLUMN = name,s,betx,bety,alfx,alfy,dx,mux,muy;
+SET, format="-22s", "11.6f";
+
+USE, SEQUENCE = fodo_rhic;
+MATCH, SEQUENCE = fodo_rhic;
+TWISS, SAVE, FILE = fodo_rhic.twi;
+PLOT, HAXIS=S, VAXIS1 =BETX,BETY, VAXIS2=DX, VMIN=0,0, VMAX=60,2, colour=100, file = frhic;
+
+USE, SEQUENCE = fodo_sliced;
+MATCH, SEQUENCE = fodo_sliced;
+TWISS, SAVE, FILE = fodo_sliced.twi;
+PLOT, HAXIS=S, VAXIS1 =BETX,BETY, VAXIS2=DX, VMIN=0,0, VMAX=60,2, colour=100, file = frhic;
+
+USE, SEQUENCE = fodo_rhic;
+MATCH, SEQUENCE = fodo_rhic;
+TWISS, SAVE, FILE = fodo_interpolate.twi;
+PLOT, interpolate, HAXIS=S, VAXIS1 =BETX,BETY, VAXIS2=DX, VMIN=0,0, VMAX=60,2, colour=100, file = frhic;
+
+stop;

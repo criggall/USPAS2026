@@ -1,0 +1,32 @@
+enter Twiss module
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+                12                 -0                  0                  0 
+
+                q1                dq1            betxmax              dxmax 
+      0.1942588753                  0        25.95361393                  0 
+
+             dxrms             xcomax             xcorms                 q2 
+                 0                  0                  0       0.2013444078 
+
+               dq2            betymax              dymax              dyrms 
+                 0        18.61913679                  0                  0 
+
+            ycomax             ycorms             deltap            synch_1 
+                 0                  0                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+           synch_6            synch_8             nflips              dqmin 
+                 0                  0                  0                  0 
+
+       dqmin_phase 
+                 0 
+table( summ q1 )   =       0.1942588753 ;
+START MATCHING
+
+number of sequences: 1
+sequence name: fodo_cell_straight
