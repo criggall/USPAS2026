@@ -1,0 +1,139 @@
+//========================================
+// Dispersion suppressor examples and play
+// Authors: Todd Satogata & Steve Peggs
+// Last edited: September 21, 2025
+//========================================
+
+BEAM, particle=proton, energy=275.0;
+ASSIGN, echo = madx.log;
+
+TITLE,'Suppress dispersion';
+
+// Geometry
+L_drift  =  1.5;
+L_dipole = 12.0;
+L_quad   =  1.0;
+theta    =  0.036;
+
+L_half_arc_cell  = L_quad +       L_dipole + 2*L_drift;    // Regular arc half cell
+L_half_comp_cell = L_quad + (2/3)*L_dipole + 2*L_drift;    // Compact dispersion suppressor half cell
+
+// Strengths
+kd = 0.084;
+kf = 0.086;
+kdds = kd;
+kfds = kf;
+
+// Drifts
+D:        DRIFT, L =       L_drift;
+D_quart:  DRIFT, L = (1/4)*L_dipole;      // Quarter of the length of a dipole
+DIP_zero: DRIFT, L =       L_dipole;      // A full length, zero angle dipole, aka drift !!
+
+// Dipoles
+DIP_full: SBEND, L =       L_dipole, ANGLE =       theta;  // Nominal arc dipole
+DIP_half: SBEND, L = (1/2)*L_dipole, ANGLE = (1/2)*theta;  // Half length, half angle, full field
+DIP_weak: SBEND, L =       L_dipole, ANGLE = (1/2)*theta;  // Full length, half angle, half field
+DIP_comp:   SBEND, L = (2/3)*L_dipole, ANGLE = (2/3)*theta;  // 2/3  length, 2/3  angle, full field 
+
+// Quadrupoles
+QFH:   QUADRUPOLE, L= 0.5*L_quad, K1 :=  kf;    // Half an arc quad, F
+QDH:   QUADRUPOLE, L= 0.5*L_quad, K1 := -kd;    // Half an arc quad, D
+QFHds: QUADRUPOLE, L= 0.5*L_quad, K1 :=  kfds;  // Half a dispersion suppressor quad, F
+QDHds: QUADRUPOLE, L= 0.5*L_quad, K1 := -kdds;  // Half a dispersion suppressor quad, D
+
+// Beamlines
+interior_full: LINE=(D,          DIP_full,          D); // Interior with a full strength dipole
+interior_half: LINE=(D, D_quart, DIP_half, D_quart, D); // Interior with a half strength dipole
+interior_weak: LINE=(D,          DIP_weak,          D); // Alternate half strength interior
+interior_zero: LINE=(D,          DIP_zero,          D); // Interior with zero bend dipole
+interior_comp: LINE=(D,          DIP_comp,          D); // Compact interior
+
+cell_full: LINE=(QFH,   interior_full,   QDH,QDH,   interior_full, QFH);  // See figure
+cell_half: LINE=(QFH,   interior_half,   QDH,QDH,   interior_half, QFH);
+cell_weak: LINE=(QFH,   interior_weak,   QDH,QDH,   interior_half, QFH);
+cell_zero: LINE=(QFH,   interior_zero,   QDH,QDH,   interior_zero, QFH);
+cell_comp: LINE=(QFHds, interior_comp, QDHds,QDHds, interior_comp, QFHds);
+
+ds_none: LINE=(5*cell_full,              4*cell_zero,              5*cell_full);
+ds_half: LINE=(3*cell_full, 2*cell_half, 4*cell_zero, 2*cell_half, 3*cell_full);
+ds_weak: LINE=(3*cell_full, 2*cell_weak, 4*cell_zero, 2*cell_weak, 3*cell_full);
+ds_comp: LINE=(3*cell_full, 2*cell_comp, 4*cell_zero, 2*cell_comp, 3*cell_full);
+
+// Initial report
+print,  text = " ";
+print,  text = "BEFORE MATCHING";
+printf, text = "Length of a regular arc half cell =%7.3f [m]", value = L_half_arc_cell;
+printf, text = "Length of a disp. supp. half cell =%7.3f [m]", value = L_half_comp_cell;
+print,  text = " ";
+printf, text = "Quad strengths in arc:  kd,   kf   = %10.6f, %10.6f", value = kd, kf;
+printf, text = "Quad strengths in comp: kdds, kfds = %10.6f, %10.6f", value = kdds, kfds;
+
+// ===========================================================================
+// Command blocks
+
+! A) Find the quadrupole strengths that achieve the desired H & V phase advances per cell
+
+!mux_goal = 0.22;
+!muy_goal = 0.22;
+!
+!use, period = cell_full;
+!match, sequence = cell_full;
+!       constraint, sequence = cell_full, range = #e, mux = mux_goal, muy = muy_goal;
+!       vary, name = kd, step = 0.000001;
+!       vary, name = kf, step = 0.000001;
+!       lmdif, calls = 5000, tolerance = 1.e-12;
+!endmatch;
+!print,  text = " ";
+!print,  text = "AFTER MATCHING ARC CELL";
+!printf, text = "Quad strengths in arc: kd,   kf   = %10.6f, %10.6f", value = kd, kf;
+!
+!use, period = cell_comp;
+!match, sequence = cell_comp;
+!       constraint, sequence = cell_comp, range = #e, mux = mux_goal, muy = muy_goal;
+!       vary, name = kdds, step = 0.000001;
+!       vary, name = kfds, step = 0.000001;
+!       lmdif, calls = 5000, tolerance = 1.e-12;
+!endmatch;
+!print,  text = " ";
+!print,  text = "AFTER MATCHING DISPERSION SUPPRESSOR CELL";
+!printf, text = "Quad strengths in comp:  kdds, kfds = %10.6f, %10.6f", value = kdds, kfds;
+
+! B) List and plot Twiss parameters for cell_full and cell_comp. 
+
+use, sequence = cell_full;
+select, flag = twiss, column = name,s,betx,bety,alfx,alfy,dx,mux,muy;     // see all magnets
+set, format="-22s", "11.6f";
+twiss, save, file = disp_supp.twi;
+plot, interpolate, haxis=s, hmax=40, vaxis1=betx,bety, vaxis2=dx, vmin=0,0, vmax=60,3, colour=100, file = disp_supp;
+
+use, sequence = cell_comp;
+select, flag = twiss, column = name,s,betx,bety,alfx,alfy,dx,mux,muy;     // see all magnets
+set, format="-22s", "11.6f";
+twiss, save, file = disp_supp.twi;
+plot, interpolate, haxis=s, hmax=40, vaxis1=betx,bety, vaxis2=dx, vmin=0,0, vmax=60,3, colour=100, file = disp_supp;
+
+stop;
+
+! C) List and plot Twiss parameters for a variety of dispersion supressor options
+
+!use, sequence = ds_none;  // goes directly from arc to straight, and back
+!use, sequence = ds_half;  // dispersion suppressor with 2 full length cells of half length, half angle dipoles
+!use, sequence = ds_weak;  // dispersion suppressor with 2 full length cells of full length, half angle dipoles
+use, sequence = ds_comp;  // dispersion suppressor with 2 compact cells of      3/4 length,  2/3 angle dipoles
+
+select, flag = twiss, column = name,s,betx,bety,alfx,alfy,dx,mux,muy;     // see all magnets
+set, format="-22s", "11.6f";
+twiss, save, file = disp_supp.twi;
+plot,   interpolate, haxis=s, hmax=500, vaxis1=betx,bety, vaxis2=dx, colour=100, file = disp_supp;
+
+stop;
+
+COMMENTS:  =======================================================
+
+0) !! Beware -- colons matter !!  The two quadrupole definitions
+
+   QFH:  QUADRUPOLE, L= L_half_quad, K1 := kf;
+   QFH:  QUADRUPOLE, L= L_half_quad, K1  = kf;
+
+are NOT the same.  Only the first version emables kf to be varied while matching.
+

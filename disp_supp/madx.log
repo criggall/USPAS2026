@@ -1,0 +1,61 @@
+ 
+BEFORE MATCHING
+Length of a regular arc half cell = 16.000 [m]
+Length of a disp. supp. half cell = 12.000 [m]
+ 
+Quad strengths in arc:  kd,   kf   =   0.084000,   0.086000
+Quad strengths in comp: kdds, kfds =   0.084000,   0.086000
+enter Twiss module
+
+++++++ table: summ
+
+     length      orbit5        alfa     gammatr 
+  32.000000   -0.000000    0.002654   19.410892 
+
+         q1         dq1     betxmax       dxmax 
+   0.237347   -0.286478   52.772064    1.658684 
+
+      dxrms      xcomax      xcorms          q2 
+   1.356346    0.000000    0.000000    0.226738 
+
+        dq2     betymax       dymax       dyrms 
+  -0.278970   53.773146    0.000000    0.000000 
+
+     ycomax      ycorms      deltap     synch_1 
+   0.000000    0.000000    0.000000    0.000000 
+
+    synch_2     synch_3     synch_4     synch_5 
+   0.000000    0.000000    0.000000    0.000000 
+
+    synch_6     synch_8      nflips       dqmin 
+   0.000000    0.000000    0.000000    0.000000 
+
+dqmin_phase 
+   0.000000 
+enter Twiss module
+
+++++++ table: summ
+
+     length      orbit5        alfa     gammatr 
+  24.000000   -0.000000    0.002150   21.564183 
+
+         q1         dq1     betxmax       dxmax 
+   0.169694   -0.182246   40.523655    1.384465 
+
+      dxrms      xcomax      xcorms          q2 
+   1.174520    0.000000    0.000000    0.160598 
+
+        dq2     betymax       dymax       dyrms 
+  -0.179773   42.299709    0.000000    0.000000 
+
+     ycomax      ycorms      deltap     synch_1 
+   0.000000    0.000000    0.000000    0.000000 
+
+    synch_2     synch_3     synch_4     synch_5 
+   0.000000    0.000000    0.000000    0.000000 
+
+    synch_6     synch_8      nflips       dqmin 
+   0.000000    0.000000    0.000000    0.000000 
+
+dqmin_phase 
+   0.000000 

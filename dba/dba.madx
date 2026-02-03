@@ -1,0 +1,60 @@
+// ===================================================
+// Double Bend Achromat
+// Authors: Volker Ziemann, Todd Satogata, Steve Peggs
+// Last edited: September 9, 2025
+// ===================================================
+
+beam, particle = electron, pc=3.0;
+assign, echo = madx.log;
+title,'DB Achromat';
+
+// Geometry
+THETA    = 0.01;
+L_CORE   = 2.0;
+L_D      = 0.5;
+L_DIPOLE = 2.0;
+
+// Drifts
+D:      DRIFT, L = L_D;
+D_CORE: DRIFT, L = L_CORE;
+
+// Bend
+DIPOLE: SBEND, L = L_DIPOLE, ANGLE = THETA;
+
+// Quad strengths
+K_CORE = 0.0;
+KD     = 1.0;
+KF     = 1.9;
+
+// Quadrupoles
+Q_CORE: QUADRUPOLE, L = 0.5,  K1 =  K_CORE;
+QD:     QUADRUPOLE, L = 0.5,  K1 = -KD;
+QF:     QUADRUPOLE, L = 0.25, K1 =  KF;
+
+// Beamlines
+CORE: LINE = (DIPOLE, D_CORE, Q_CORE, D_CORE, DIPOLE);
+DBA:  LINE = (QF,D,QD,D, CORE, D,QD,D,QF);
+
+// A) Propagate initial betas through CORE beamline
+! use, sequence = core;
+! select, flag=twiss, column=name,s,betx,bety,alfx,alfy,dx,dpx;
+!! twiss, save, betx =  1.0, bety =  1.0, dx = 0.0, dpx = 0.0, file = dba.twi;
+! twiss, save, betx = 10.0, bety = 10.0, dx = 0.0, dpx = 0.0, file = dba.twi;
+! plot, haxis=s, vaxis1=betx,bety, vaxis2=dx, vmax=200,0.04, colour=100,interpolate,file=dba;
+! stop;
+
+// B) Attempt a periodic solution for CORE
+! use, sequence = core;
+! select, flag=twiss, column=name,s,betx,bety,alfx,alfy,dx,dpx;
+! match, sequence = core;
+! twiss, save, file = dba.twi;
+! plot, haxis=s, vaxis1=betx,bety, vaxis2=dx, vmax=200,0.04, colour=100,interpolate,file=dba;
+! stop;
+
+// C) Attempt a periodic solution for DBA 
+! use, sequence = dba;
+! select, flag=twiss, column=name,s,betx,bety,alfx,alfy,dx,dpx;
+! match, sequence = dba;
+! twiss, save, file = dba.twi;
+! plot, haxis=s, vaxis1=betx,bety, vaxis2=dx, vmax=40,0.05, colour=100,interpolate,file=dba;
+! stop;
