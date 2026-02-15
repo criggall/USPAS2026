@@ -1,22 +1,22 @@
 
 Text output going to ASSIGNed echo file
-Theta =  0.184800 radians
+Theta =  0.174533 radians
 
 enter Twiss module
 
 ++++++ table: summ
 
      length      orbit5        alfa     gammatr 
- 408.000000   -0.000000    0.108269    3.039125 
+ 408.000000   -0.000000    0.097940    3.195367 
 
          q1         dq1     betxmax       dxmax 
-   3.163851    2.255207   39.025266    9.120617 
+   3.140596   -0.166157   39.267388    8.739232 
 
       dxrms      xcomax      xcorms          q2 
-   7.443829    0.000000    0.000000    3.158103 
+   7.131322    0.000000    0.000000    3.158103 
 
         dq2     betymax       dymax       dyrms 
-   2.746386   39.499121    0.000000    0.000000 
+  -0.175588   39.499121    0.000000    0.000000 
 
      ycomax      ycorms      deltap     synch_1 
    0.000000    0.000000    0.000000    0.000000 
@@ -46,7 +46,7 @@ Node_Name                  Constraint   Type  Target Value       Final Value    
 --------------------------------------------------------------------------------------------------
 
 
-Final Penalty Function =   1.77882140e-23
+Final Penalty Function =   5.84390426e-02
 
 
 
@@ -54,15 +54,14 @@ Final Penalty Function =   1.77882140e-23
 
 Variable                 Final Value  Initial Value Lower Limit  Upper Limit 
 --------------------------------------------------------------------------------
-ksf                       9.57791e-03  1.80200e-02 -1.00000e+20  1.00000e+20
-ksd                      -1.58883e-02 -3.06280e-02 -1.00000e+20  1.00000e+20
+ksf                       1.80200e-02  1.80200e-02 -1.00000e+20  1.00000e+20
+ksd                      -3.06280e-02 -3.06280e-02 -1.00000e+20  1.00000e+20
 
 END MATCH SUMMARY
 
-VARIABLE "TAR" SET TO   1.77882140e-23
+VARIABLE "TAR" SET TO   5.84390426e-02
 
-H & V tunes          (Q1,Q2)    = 3.163851 3.158103
-H & V chromaticities (DQ1, DQ2) = -0.000000 0.000000
+H & V tunes          (Q1,Q2)    = 3.140596 3.158103
+H & V chromaticities (DQ1, DQ2) = -0.166157 -0.175588
 ! Find DQ1 & DQ2 from ++++++ table: summ printout in madx.log !
-
 
